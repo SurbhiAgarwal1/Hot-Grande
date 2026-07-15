@@ -16,7 +16,7 @@ const Island = () => {
         <planeGeometry args={[300, 300]} />
         <meshStandardMaterial color="#68C3C5" roughness={0.1} metalness={0.2} />
       </mesh>
-      
+
       {/* Main Brown Island (Steep Mountain Shape) */}
       <mesh position={[0, -2, 0]} receiveShadow>
         <coneGeometry args={[30, 8, 64]} />
@@ -99,19 +99,19 @@ const PlayerAvatar3D = ({ isOther = false, isMoving = false }) => {
   const rightArmRef = useRef();
   const leftLegRef = useRef();
   const rightLegRef = useRef();
-  
+
   // Custom colors for other players vs local player
   const shirtColor = isOther ? "#3498DB" : "#9B59B6";
-  
+
   useFrame((state) => {
     if (!groupRef.current) return;
-    
+
     // Procedural Animation!
     if (isMoving) {
       const time = state.clock.getElapsedTime();
       const speed = 15;
       const angle = Math.sin(time * speed) * 0.8;
-      
+
       // Swing arms and legs
       if (leftArmRef.current) leftArmRef.current.rotation.x = angle;
       if (rightArmRef.current) rightArmRef.current.rotation.x = -angle;
@@ -133,7 +133,7 @@ const PlayerAvatar3D = ({ isOther = false, isMoving = false }) => {
         <boxGeometry args={[0.8, 0.8, 0.8]} />
         <meshStandardMaterial color="#F1C40F" />
       </mesh>
-      
+
       {/* Torso */}
       <mesh position={[0, 1.7, 0]} castShadow>
         <boxGeometry args={[1, 1.2, 0.5]} />
@@ -193,10 +193,10 @@ const OtherPlayer = ({ id, startPos, bombHolder }) => {
     if (ref.current && networkPositions[id]) {
       const targetPos = new THREE.Vector3(...networkPositions[id]);
       const dist = ref.current.position.distanceTo(targetPos);
-      
+
       // If distance is significant, player is moving
       isMovingRef.current = dist > 0.02;
-      
+
       // Smoothly interpolate (lerp) towards the network position
       ref.current.position.lerp(targetPos, 0.2);
     } else {
@@ -217,7 +217,7 @@ const OtherPlayer = ({ id, startPos, bombHolder }) => {
 
 // Mathematical function to perfectly stick the player to the surface of the mountain!
 const getTerrainHeight = (x, z) => {
-  const dist = Math.sqrt(x*x + z*z);
+  const dist = Math.sqrt(x * x + z * z);
   // Cone is at y=-2, height=8, radius=30
   const coneY = -2 + 4 - (dist / 30) * 8;
   // Floor is at y=-3.5 (ocean)
@@ -225,9 +225,10 @@ const getTerrainHeight = (x, z) => {
 };
 
 // Local Player Controller
-const PlayerController = ({ onMove, bombHolder, gameState }) => {
+const PlayerController = ({ onMove, bombHolder, gameState, joystickVectorRef }) => {
   const playerRef = useRef();
   const [keys, setKeys] = useState({ w: false, a: false, s: false, d: false });
+  const [isMovingState, setIsMovingState] = useState(false);
   const speed = 8;
   const lastEmitTime = useRef(0);
   const isHoldingBomb = bombHolder === socket.id;
@@ -257,13 +258,37 @@ const PlayerController = ({ onMove, bombHolder, gameState }) => {
 
   useFrame((state, delta) => {
     if (!playerRef.current) return;
-    
+
     let moved = false;
+    let moveX = 0;
+    let moveZ = 0;
+
     if (gameState === 'playing') {
-      if (keys.w) { playerRef.current.position.z -= speed * delta; moved = true; }
-      if (keys.s) { playerRef.current.position.z += speed * delta; moved = true; }
-      if (keys.a) { playerRef.current.position.x -= speed * delta; moved = true; }
-      if (keys.d) { playerRef.current.position.x += speed * delta; moved = true; }
+      if (keys.w) moveZ -= 1;
+      if (keys.s) moveZ += 1;
+      if (keys.a) moveX -= 1;
+      if (keys.d) moveX += 1;
+
+      // Add touch joystick input if present
+      if (joystickVectorRef && joystickVectorRef.current) {
+        const joy = joystickVectorRef.current;
+        if (joy.x !== 0 || joy.y !== 0) {
+          moveX += joy.x;
+          moveZ += joy.y;
+        }
+      }
+
+      const mag = Math.sqrt(moveX * moveX + moveZ * moveZ);
+      if (mag > 0.01) {
+        const currentSpeed = isHoldingBomb ? 10 : 8; // Bomb holders run faster
+        const normalizedX = moveX / mag;
+        const normalizedZ = moveZ / mag;
+        const scale = Math.min(1, mag); // support analog sensitivity
+
+        playerRef.current.position.x += normalizedX * scale * currentSpeed * delta;
+        playerRef.current.position.z += normalizedZ * scale * currentSpeed * delta;
+        moved = true;
+      }
     }
 
     if (moved) {
@@ -278,6 +303,10 @@ const PlayerController = ({ onMove, bombHolder, gameState }) => {
       }
     }
 
+    if (moved !== isMovingState) {
+      setIsMovingState(moved);
+    }
+
     // Camera Follow
     state.camera.position.x = playerRef.current.position.x;
     state.camera.position.y = playerRef.current.position.y + 3;
@@ -287,7 +316,7 @@ const PlayerController = ({ onMove, bombHolder, gameState }) => {
 
   return (
     <group ref={playerRef} position={[0, 2, 5]}>
-      <PlayerAvatar3D isMoving={keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight} />
+      <PlayerAvatar3D isMoving={isMovingState} />
       {/* Render the bomb higher and smaller above player if they have it */}
       {isHoldingBomb && <Bomb position={[0, 3.5, 0]} />}
     </group>
@@ -349,7 +378,7 @@ const playBeep = () => {
     gainNode.connect(sharedAudioCtx.destination);
     oscillator.start();
     oscillator.stop(sharedAudioCtx.currentTime + 0.1);
-  } catch(e) {
+  } catch (e) {
     // Ignore
   }
 };
@@ -362,20 +391,68 @@ export default function GameScene3D({ setBombTimerText }) {
   const bombHolderRef = useRef(null);
   const playersRef = useRef({});
 
+  // Mobile Touch Controls
+  const [isMobile, setIsMobile] = useState(false);
+  const joystickContainerRef = useRef(null);
+  const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+  const joystickVectorRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleTouchStart = (e) => {
+    e.stopPropagation();
+  };
+
+  const handleTouchMove = (e) => {
+    e.stopPropagation();
+    if (!joystickContainerRef.current) return;
+    const touch = e.touches[0];
+    const rect = joystickContainerRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const maxRadius = rect.width / 2 - 10;
+
+    let limitedX = dx;
+    let limitedY = dy;
+    if (distance > maxRadius) {
+      limitedX = (dx / distance) * maxRadius;
+      limitedY = (dy / distance) * maxRadius;
+    }
+
+    setJoystickPos({ x: limitedX, y: limitedY });
+    joystickVectorRef.current = { x: limitedX / maxRadius, y: limitedY / maxRadius };
+  };
+
+  const handleTouchEnd = (e) => {
+    e.stopPropagation();
+    setJoystickPos({ x: 0, y: 0 });
+    joystickVectorRef.current = { x: 0, y: 0 };
+  };
+
   useEffect(() => {
     // FIX: Request initial state on mount so we don't miss the first broadcast!
     socket.emit('requestInitialState');
-    
+
     socket.on('gameStateUpdate', (data) => {
       setGameState(data.state);
       if (setBombTimerText) {
         if (data.state === 'countdown') {
-            setBombTimerText(`STARTING IN ${data.countdown}`);
+          setBombTimerText(`STARTING IN ${data.countdown}`);
         } else if (data.state === 'lobby') {
-            setBombTimerText('LOBBY WAITING');
+          setBombTimerText('LOBBY WAITING');
         } else if (data.state === 'playing') {
-            // Force text to update to avoid it sticking at 0.00
-            setBombTimerText(15);
+          // Force text to update to avoid it sticking at 0.00
+          setBombTimerText(15);
         }
       }
     });
@@ -441,7 +518,7 @@ export default function GameScene3D({ setBombTimerText }) {
     const currentPlayers = playersRef.current;
 
     socket.emit('playerMovement', position);
-    
+
     // Simple Collision Detection for passing bomb
     if (currentBombHolder === socket.id) {
       Object.keys(currentPlayers).forEach(otherId => {
@@ -463,44 +540,62 @@ export default function GameScene3D({ setBombTimerText }) {
   const isNight = hour < 6 || hour >= 18;
 
   return (
-    <Canvas shadows camera={{ position: [0, 5, 15], fov: 60 }}>
-      {isNight ? (
-        <>
-          <Sky sunPosition={[0, -100, 0]} turbidity={0.1} rayleigh={0.1} mieCoefficient={0.005} />
-          <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-          <ambientLight intensity={0.1} color="#4B7B9C" />
-          <directionalLight castShadow position={[10, 20, 10]} intensity={0.6} color="#88AAFF" shadow-mapSize={[1024, 1024]} />
-        </>
-      ) : (
-        <>
-          <Sky sunPosition={[100, 20, 100]} />
-          <ambientLight intensity={0.5} />
-          <directionalLight castShadow position={[10, 20, 10]} intensity={1.5} shadow-mapSize={[1024, 1024]} />
-        </>
-      )}
-      
-      <Suspense fallback={null}>
-        <Island />
-        
-        {/* Render local player */}
-        <PlayerController onMove={handleMove} bombHolder={bombHolder} gameState={gameState} />
+    <div className="w-full h-full relative">
+      <Canvas shadows camera={{ position: [0, 5, 15], fov: 60 }}>
+        {isNight ? (
+          <>
+            <Sky sunPosition={[0, -100, 0]} turbidity={0.1} rayleigh={0.1} mieCoefficient={0.005} />
+            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+            <ambientLight intensity={0.1} color="#4B7B9C" />
+            <directionalLight castShadow position={[10, 20, 10]} intensity={0.6} color="#88AAFF" shadow-mapSize={[1024, 1024]} />
+          </>
+        ) : (
+          <>
+            <Sky sunPosition={[100, 20, 100]} />
+            <ambientLight intensity={0.5} />
+            <directionalLight castShadow position={[10, 20, 10]} intensity={1.5} shadow-mapSize={[1024, 1024]} />
+          </>
+        )}
 
-        {/* Render other players */}
-        {Object.keys(players).map((id) => {
-          if (id !== socket.id) {
-            const isHoldingBomb = bombHolder === id;
-            return (
-              <OtherPlayer 
-                key={id} 
-                id={id} 
-                startPos={players[id].position} 
-                bombHolder={bombHolder} 
-              />
-            );
-          }
-          return null;
-        })}
-      </Suspense>
-    </Canvas>
+        <Suspense fallback={null}>
+          <Island />
+
+          {/* Render local player */}
+          <PlayerController onMove={handleMove} bombHolder={bombHolder} gameState={gameState} joystickVectorRef={joystickVectorRef} />
+
+          {/* Render other players */}
+          {Object.keys(players).map((id) => {
+            if (id !== socket.id) {
+              const isHoldingBomb = bombHolder === id;
+              return (
+                <OtherPlayer
+                  key={id}
+                  id={id}
+                  startPos={players[id].position}
+                  bombHolder={bombHolder}
+                />
+              );
+            }
+            return null;
+          })}
+        </Suspense>
+      </Canvas>
+
+      {/* Mobile Touch Joystick */}
+      {isMobile && (
+        <div
+          ref={joystickContainerRef}
+          className="absolute bottom-12 left-12 w-28 h-28 bg-white/10 backdrop-blur-md rounded-full border border-white/20 z-50 flex items-center justify-center touch-none select-none shadow-lg active:scale-95 transition-transform"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className="w-10 h-10 bg-white/60 rounded-full border border-white shadow-md pointer-events-none"
+            style={{ transform: `translate3d(${joystickPos.x}px, ${joystickPos.y}px, 0)` }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
