@@ -12,11 +12,11 @@
 
 ## 👁️ The Grande
 
-The sky shifts unnaturally. A rhythmic ticking echoes across the isolated landmass. 
+The sky shifts unnaturally across the isolated landmass. 
 
-It is coming. Once *The Grande* chooses you, time begins to collapse. The others are panicking. Some are watching. Some are running. 
+It is coming. Once *The Grande* chooses you, the collapse begins. The others are panicking. Some are watching. Some are running. 
 
-Do not let the ticking stop while it is with you. 
+Do not let it consume you. 
 
 Enter the arena.
 
