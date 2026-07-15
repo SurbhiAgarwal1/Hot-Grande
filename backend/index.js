@@ -6,6 +6,15 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+const path = require('path');
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Fallback for React Router (if needed)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
