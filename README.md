@@ -10,15 +10,15 @@
 
 <br/>
 
-## 👁️ The Anomaly
+## 👁️ The Grande
 
-You wake up on an isolated landmass. The sky shifts unnaturally. There is a faint, rhythmic ticking echoing in the distance. 
+You wake up on an isolated landmass. The sky shifts unnaturally. A faint, rhythmic ticking echoes in the distance. 
 
-Something has been attached to you, and time is running out. The others trapped here are panicking. Some are watching you. Some are running. 
+They call it *The Grande*. Once it chooses you, your time begins to run out. The others trapped here are panicking. Some are watching you. Some are running. 
 
-You must pass the burden before the timer reaches zero. There is no escape. There is only survival.
+The only way to survive is to transfer it to someone else. There is no escape.
 
-What is the anomaly? There's only one way to find out. Enter the arena.
+Will you survive The Grande? Enter the arena.
 
 ### ✨ The Experience
 
