@@ -12,13 +12,13 @@
 
 ## 👁️ The Grande
 
-You wake up on an isolated landmass. The sky shifts unnaturally. A faint, rhythmic ticking echoes in the distance. 
+The sky shifts unnaturally. A rhythmic ticking echoes across the isolated landmass. 
 
-They call it *The Grande*. Once it chooses you, your time begins to run out. The others trapped here are panicking. Some are watching you. Some are running. 
+It is coming. Once *The Grande* chooses you, time begins to collapse. The others are panicking. Some are watching. Some are running. 
 
-The only way to survive is to transfer it to someone else. There is no escape.
+Do not let the ticking stop while it is with you. 
 
-Will you survive The Grande? Enter the arena.
+Enter the arena.
 
 ### ✨ The Experience
 
