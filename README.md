@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/Status-Hackathon_Ready-success?style=for-the-badge" alt="Status" />
   <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/badge/Engine-React_Three_Fiber-black?style=for-the-badge&logo=react" alt="Engine" />
   <br/><br/>
@@ -17,20 +16,14 @@
 
 Run, jump, and frantically pass the bomb to other players to survive. Last player standing wins!
 
-### ✨ Key Features
+### ✨ The Experience
 
-- **🌐 Real-Time Multiplayer:** Instant, zero-lag synchronization using Socket.io. Play with friends or against our intelligent AI.
-- **🤖 Advanced Psychological AI:** Bots aren't just mindless drones. They feature simulated human reaction times, panic modes, and advanced pathfinding to ensure they play exactly like real people.
-- **🎙️ Proximity Voice Chat:** Talk to other players in real-time using WebRTC.
-- **🛡️ AI Voice Moderation:** A strict, automated moderation system ensures the arena remains toxic-free.
-- **🌅 Dynamic Environments:** A beautiful real-time Day/Night cycle that matches your local time.
-- **💎 Premium UI/UX:** Stunning, modern glassmorphism interfaces, cinematic landing pages, and reactive mouse parallax effects.
-
-### 🧠 Technical Highlights (For Judges)
-
-- **Simulated Human Psychology (AI):** Instead of standard "A-Star" pathfinding, our bots utilize momentum vectors and a "Panic Reaction Time" algorithm. When an AI receives the bomb, they freeze in panic for 600ms, continuing to run in their previous direction before realizing they need to chase—flawlessly mimicking real human startle reflexes!
-- **Tick-Rate Sync Architecture:** The Node.js server runs a strict 20Hz (50ms) tick loop to broadcast AI physics, while the client uses Three.js interpolation (`useFrame`) to render them at a buttery-smooth 60+ FPS, masking any network latency.
-- **Peer-to-Peer Audio:** To prevent overloading the central Node.js Socket server, Voice Chat is offloaded to a WebRTC mesh network using PeerJS, ensuring zero-latency trash-talk without server cost!
+- **🌐 The Network:** Instant, zero-lag synchronization. You won't know if you're running from a friend or something else.
+- **🤖 The Entities:** They aren't just bots. They observe, they panic, and they react. Don't assume they'll just stand there. 
+- **🎙️ Proximity Communications:** Talk to those around you in real-time. But remember, the system is always listening.
+- **🛡️ The Overseer:** An automated moderation system ensures the arena remains clean. Toxicity is immediately punished.
+- **🌅 Time Shifts:** The environment changes based on when you dare to enter. 
+- **💎 The Interface:** A stunning, reactive glassmorphism terminal that watches your every move.
 
 ---
 
