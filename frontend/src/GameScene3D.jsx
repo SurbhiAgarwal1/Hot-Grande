@@ -4,7 +4,8 @@ import { OrbitControls, Sky, Billboard, useTexture, Text, Stars } from '@react-t
 import * as THREE from 'three';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:3001');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const socket = io(BACKEND_URL);
 
 // Custom Map matching user's design
 const Island = () => {

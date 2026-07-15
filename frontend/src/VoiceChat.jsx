@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 
 // We share the same socket connection
-const socket = io('http://localhost:3001');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const socket = io(BACKEND_URL);
 
 export default function VoiceChat() {
   const [micEnabled, setMicEnabled] = useState(false);
