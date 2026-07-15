@@ -26,6 +26,12 @@ Run, jump, and frantically pass the bomb to other players to survive. Last playe
 - **🌅 Dynamic Environments:** A beautiful real-time Day/Night cycle that matches your local time.
 - **💎 Premium UI/UX:** Stunning, modern glassmorphism interfaces, cinematic landing pages, and reactive mouse parallax effects.
 
+### 🧠 Technical Highlights (For Judges)
+
+- **Simulated Human Psychology (AI):** Instead of standard "A-Star" pathfinding, our bots utilize momentum vectors and a "Panic Reaction Time" algorithm. When an AI receives the bomb, they freeze in panic for 600ms, continuing to run in their previous direction before realizing they need to chase—flawlessly mimicking real human startle reflexes!
+- **Tick-Rate Sync Architecture:** The Node.js server runs a strict 20Hz (50ms) tick loop to broadcast AI physics, while the client uses Three.js interpolation (`useFrame`) to render them at a buttery-smooth 60+ FPS, masking any network latency.
+- **Peer-to-Peer Audio:** To prevent overloading the central Node.js Socket server, Voice Chat is offloaded to a WebRTC mesh network using PeerJS, ensuring zero-latency trash-talk without server cost!
+
 ---
 
 ## 🛠️ Technology Stack
