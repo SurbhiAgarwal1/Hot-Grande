@@ -10,11 +10,15 @@
 
 <br/>
 
-## 🎮 About The Game
+## 👁️ The Anomaly
 
-**Hot Grande** is an adrenaline-fueled 3D multiplayer survival game where players are trapped on an island with a ticking time bomb. One player starts with the bomb—if the timer hits zero while you hold it, you explode and are eliminated! 
+You wake up on an isolated landmass. The sky shifts unnaturally. There is a faint, rhythmic ticking echoing in the distance. 
 
-Run, jump, and frantically pass the bomb to other players to survive. Last player standing wins!
+Something has been attached to you, and time is running out. The others trapped here are panicking. Some are watching you. Some are running. 
+
+You must pass the burden before the timer reaches zero. There is no escape. There is only survival.
+
+What is the anomaly? There's only one way to find out. Enter the arena.
 
 ### ✨ The Experience
 
